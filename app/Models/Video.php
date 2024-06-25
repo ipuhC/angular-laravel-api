@@ -18,4 +18,8 @@ class Video extends Model
         'video_file',
         'thumbnail',
     ];
+    public function comments()
+    {
+        return $this->hasMany(Comment::class);
+    }
 }

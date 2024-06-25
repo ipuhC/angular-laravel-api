@@ -8,6 +8,22 @@ use Illuminate\Support\Facades\Storage;
 
 class VideoController extends Controller
 {
+    public function getComments($id)
+    {
+        $video = Video::with('comments.user')->find($id);
+
+        if (!$video) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Video not found',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'comments' => $video->comments,
+        ], 200);
+    }
     /**
      * Display a listing of the resource.
      */
