@@ -8,6 +8,33 @@ use Illuminate\Support\Facades\Storage;
 
 class VideoController extends Controller
 {
+    public function updateLikes($id, Request $request)
+    {
+        $video = Video::findOrFail($id);
+        $video->likes = $request->input('likes');
+        $video->save();
+
+        return response()->json($video, 200);
+    }
+
+    public function updateDislikes($id, Request $request)
+    {
+        $video = Video::findOrFail($id);
+        $video->dislikes = $request->input('dislikes');
+        $video->save();
+
+        return response()->json($video, 200);
+    }
+
+    public function updateViews($id, Request $request)
+    {
+        $video = Video::findOrFail($id);
+        $video->views = $request->input('views');
+        $video->save();
+
+        return response()->json($video, 200);
+    }
+
     public function getComments($id)
     {
         $video = Video::with('comments.user')->find($id);
