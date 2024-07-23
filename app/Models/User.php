@@ -17,11 +17,42 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'name', 'email', 'password', 'role',
+        'name',
+        'email',
+        'password',
+        'profile_photo',
+        
+        'subscriptions', // Agrega este campo
     ];
+    public function subscriptions()
+{
+    return $this->belongsToMany(User::class, 'subscriptions', 'user_id', 'subscribed_user_id');
+}
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+    public function subscribeTo($userId)
+    {
+        $subscriptions = $this->subscriptions ?? [];
+        if (!in_array($userId, $subscriptions)) {
+            $subscriptions[] = $userId;
+            $this->subscriptions = $subscriptions;
+            $this->save();
+        }
+    }
+    public function unsubscribeFrom($userId)
+    {
+        $subscriptions = $this->subscriptions ?? [];
+        if (($key = array_search($userId, $subscriptions)) !== false) {
+            unset($subscriptions[$key]);
+            $this->subscriptions = array_values($subscriptions);
+            $this->save();
+        }
+    }
+    public function isSubscribedTo($userId)
+    {
+        return in_array($userId, $this->subscriptions ?? []);
     }
     /**
      * The attributes that should be hidden for serialization.
@@ -43,6 +74,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'subscriptions' => 'array',
         ];
     }
 }
