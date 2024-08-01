@@ -10,6 +10,9 @@ use Illuminate\Support\Facades\Route;
 // Ruta de prueba para verificar si la API está funcionando
 
 Route::post('register', [AuthController::class, 'register']);
+
+Route::post('users/{id}/change-password', [AuthController::class, 'changePassword']);
+
 Route::post('login', [AuthController::class, 'login']);
 Route::get('users/{id}/details', [AuthController::class, 'getUserDetails']);
 

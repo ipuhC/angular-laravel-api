@@ -94,8 +94,6 @@ class AuthController extends Controller
         return response()->json(['token' => $token, 'role' => $user->role, 'name' => $user->name, 'userId' => $user->id], 200);
     }
 
-    
-
     public function getUserDetails($id)
     {
         $user = User::find($id);
@@ -144,6 +142,52 @@ class AuthController extends Controller
         }
 
     }
+
+    public function changePassword(Request $request, $id)
+{
+    $user = User::find($id);
+
+    if (!$user) {
+        return response()->json(['error' => 'Usuario no encontrado'], 404);
+    }
+
+    $validator = Validator::make($request->all(), [
+        'current_password' => 'required|string|min:8',
+        'new_password' => 'required|string|min:8|confirmed',
+    ]);
+
+    if ($validator->fails()) {
+        $errors = $validator->errors();
+        $customErrors = [];
+
+        if ($errors->has('current_password')) {
+            $customErrors['current_password'] = 'La contraseña actual es obligatoria.';
+        }
+
+        if ($errors->has('new_password')) {
+            $customErrors['new_password'] = 'La nueva contraseña debe tener al menos 8 caracteres y coincidir con la confirmación.';
+        }
+
+        return response()->json(['errors' => $customErrors], 422);
+    }
+
+    if (!Hash::check($request->current_password, $user->password)) {
+        return response()->json(['error' => 'La contraseña actual no es correcta'], 401);
+    }
+
+    try {
+        $user->password = Hash::make($request->new_password);
+        $user->save();
+
+        return response()->json(['message' => 'Contraseña actualizada exitosamente'], 200);
+    } catch (\Exception $e) {
+        return response()->json([
+            'message' => 'Hubo un problema al actualizar la contraseña. Inténtelo de nuevo más tarde.',
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
 
 
 }

@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Storage;
 class VideoController extends Controller
 {
     
-
     public function updateLikes($id, Request $request)
     {
         $video = Video::findOrFail($id);
